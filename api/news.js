@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         api_key: process.env.TAVILY_API_KEY,
         query: searchQuery,
         topic: 'news',
-        search_depth: 'advanced',
+        search_depth: 'basic',
         max_results: 6,
         include_answer: false,
         days: 7
