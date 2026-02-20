@@ -559,7 +559,7 @@ body {
     <div class="masthead-right">
       <div class="dateline" id="dateline"></div>
       <div class="live-pill"><span class="live-dot"></span><span id="statusText">En attente</span></div>
-      <button class="refresh-btn" id="refreshBtn" onclick="loadNews()">↻ Actualiser</button>
+      <button class="refresh-btn" id="refreshBtn" onclick="refreshCurrent()">↻ Actualiser</button>
     </div>
   </div>
   <div class="controls" style="padding: 16px 0 0;">
@@ -671,9 +671,9 @@ body {
     items.forEach((item, i) => {
       const el = document.createElement('article');
       el.className = 'news-item';
-      const seed = Math.abs((item.title || 'ai').split('').reduce((a,c) => a + c.charCodeAt(0), i * 17)) % 1000 + 10;
+      const seed = (i * 37 + 42);
       const imgSrc = item.image || ('https://picsum.photos/seed/' + seed + '/800/400');
-      const imgHtml = '<div class="news-img-wrap"><img class="news-img" src="' + imgSrc + '" alt="" loading="lazy" onerror="this.src='https://picsum.photos/seed/' + (seed+1) + '/800/400'"></div>';
+      const imgHtml = '<div class="news-img-wrap"><img class="news-img" src="' + imgSrc + '" alt="" loading="lazy" onerror="this.src='https://picsum.photos/' + (800) + '/' + (400) + '?random=' + seed + ''"></div>';
 
       el.innerHTML = `
         ${imgHtml}
@@ -706,11 +706,24 @@ body {
   function filterTag(btn, tag) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    currentTag = tag;
     if (!tag) {
+      currentQuery = null;
       if (allItems.length) renderItems(allItems);
       else loadNews();
     } else {
       loadNews(tagQueries[tag] || tag);
+    }
+  }
+
+  let currentQuery = null;
+  let currentTag = null;
+
+  function refreshCurrent() {
+    if (currentTag) {
+      loadNews(tagQueries[currentTag] || currentTag);
+    } else {
+      loadNews(null);
     }
   }
 
