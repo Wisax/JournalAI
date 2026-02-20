@@ -65,9 +65,9 @@ Règles :
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.3,
-        max_tokens: 4000,
+        max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Voici les articles trouvés cette semaine. Formate-les en JSON :\n\n${searchContext}` }
