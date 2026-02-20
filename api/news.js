@@ -8,38 +8,55 @@ export default async function handler(req, res) {
 
   const { query } = req.body || {};
 
-  const systemPrompt = `Tu es AI PULSE, un agrégateur de nouvelles IA. Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, juste le JSON brut.
+  try {
+    // STEP 1 : Tavily search pour de vraies actus
+    const searchQuery = query
+      ? `AI intelligence artificielle ${query} actualités 2025`
+      : 'intelligence artificielle actualités dernières nouvelles LLM modèles 2025';
+
+    const tavilyRes = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: process.env.TAVILY_API_KEY,
+        query: searchQuery,
+        search_depth: 'basic',
+        max_results: 10,
+        include_answer: false
+      })
+    });
+
+    const tavilyData = await tavilyRes.json();
+    if (!tavilyRes.ok) return res.status(500).json({ error: tavilyData.message || 'Erreur Tavily' });
+
+    const results = tavilyData.results || [];
+    const searchContext = results.map(r => `TITRE: ${r.title}\nURL: ${r.url}\nRÉSUMÉ: ${r.content}`).join('\n\n---\n\n');
+
+    // STEP 2 : Groq formate les résultats en JSON propre
+    const systemPrompt = `Tu es AI PULSE, un agrégateur de nouvelles IA. Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, juste le JSON brut.
 
 Format exact :
 {
   "items": [
     {
       "title": "Titre accrocheur de la news",
-      "summary": "Résumé factuel de 2-3 phrases expliquant l'essentiel de la nouvelle.",
+      "summary": "Résumé factuel de 2-3 phrases en français.",
       "source": "NOM SOURCE",
-      "url": "https://...",
-      "time": "Il y a 2h",
+      "url": "https://... (URL EXACTE fournie)",
+      "time": "Aujourd'hui",
       "tags": ["LLM", "OpenAI"]
     }
   ]
 }
 
 Règles :
-- Titres percutants style presse
-- Résumés factuels et informatifs en français
-- Sources réelles (TechCrunch, The Verge, Wired, Reuters, Le Monde, etc.)
-- URLs plausibles des vraies sources
-- Tags pertinents parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité
-- Temps relatif : "Il y a Xh", "Il y a Xmin", "Aujourd'hui"
-- Actualités des dernières semaines
-- Variété de sujets et d'entreprises`;
+- Utilise UNIQUEMENT les articles fournis
+- Garde les URLs EXACTES telles quelles
+- Résumés en français
+- Tags parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité
+- Sélectionne les articles les plus intéressants`;
 
-  const userPrompt = query
-    ? `Tu es journaliste IA. Liste 5 actualités récentes et importantes sur : "${query}" dans le monde de l'IA.`
-    : `Tu es journaliste IA. Liste les 8 actualités les plus importantes et récentes dans le monde de l'IA (sorties de modèles, recherches, produits, réglementations, levées de fonds...). Couvre : OpenAI, Google DeepMind, Anthropic, Meta AI, Mistral, xAI, Microsoft, Hugging Face, startups, académique.`;
-
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,24 +64,19 @@ Règles :
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        temperature: 0.7,
+        temperature: 0.3,
         max_tokens: 4000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: 'user', content: `Voici les articles trouvés sur le web. Formate-les en JSON :\n\n${searchContext}` }
         ]
       })
     });
 
-    const data = await response.json();
+    const groqData = await groqRes.json();
+    if (!groqRes.ok) return res.status(500).json({ error: groqData?.error?.message || 'Erreur Groq' });
 
-    if (!response.ok) {
-      const errMsg = data?.error?.message || `Erreur ${response.status}`;
-      return res.status(response.status).json({ error: errMsg });
-    }
-
-    const text = data?.choices?.[0]?.message?.content || '';
-
+    const text = groqData?.choices?.[0]?.message?.content || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return res.status(500).json({ error: 'Pas de JSON dans la réponse', raw: text });
 
