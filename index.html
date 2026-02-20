@@ -271,6 +271,12 @@
     color: var(--ink-faint);
     letter-spacing: 0.08em;
   }
+
+  /* FILTERS */
+  .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 0; }
+  .filter-btn { font-family: var(--mono); font-size: 10px; padding: 4px 12px; background: none; border: 1px solid var(--border); color: var(--ink-soft); cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.15s; }
+  .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 </style>
 </head>
 <body>
@@ -294,6 +300,18 @@
   <div class="search-bar">
     <input class="search-input" id="searchInput" type="text" placeholder="Rechercher un sujet IA... ex: GPT-5, robotique, open source" />
     <button class="search-btn" onclick="searchTopic()">Chercher</button>
+  </div>
+
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterTag(this, null)">Tout</button>
+    <button class="filter-btn" onclick="filterTag(this, 'Audiovisuel')">🎬 Audiovisuel</button>
+    <button class="filter-btn" onclick="filterTag(this, 'LLM')">LLM</button>
+    <button class="filter-btn" onclick="filterTag(this, 'Recherche')">Recherche</button>
+    <button class="filter-btn" onclick="filterTag(this, 'Startup')">Startup</button>
+    <button class="filter-btn" onclick="filterTag(this, 'Réglementation')">Réglementation</button>
+    <button class="filter-btn" onclick="filterTag(this, 'Robotique')">Robotique</button>
+    <button class="filter-btn" onclick="filterTag(this, 'Open Source')">Open Source</button>
   </div>
 
   <div class="feed">
@@ -372,6 +390,23 @@
     });
   }
 
+
+  let allItems = [];
+
+  function filterTag(btn, tag) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (!tag) {
+      renderItems(allItems);
+    } else {
+      const filtered = allItems.filter(item => (item.tags || []).includes(tag));
+      renderItems(filtered);
+      if (filtered.length === 0) {
+        document.getElementById('feedContent').innerHTML = '<div class="error-state"><p>Aucun article dans cette catégorie</p><small>Essayez d'actualiser pour obtenir de nouveaux articles.</small></div>';
+      }
+    }
+  }
+
   async function loadNews(query = null) {
     const btn = document.getElementById('refreshBtn');
     const status = document.getElementById('statusText');
@@ -390,6 +425,7 @@
 
     try {
       const items = await fetchAINews(query);
+      allItems = items;
       renderItems(items);
       const now = new Date();
       status.textContent = `Mis à jour à ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
