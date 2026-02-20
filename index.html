@@ -307,12 +307,6 @@
   <div class="filter-bar">
     <button class="filter-btn active" onclick="filterTag(this, null)">Tout</button>
     <button class="filter-btn" onclick="filterTag(this, 'Audiovisuel')">🎬 Audiovisuel</button>
-    <button class="filter-btn" onclick="filterTag(this, 'LLM')">LLM</button>
-    <button class="filter-btn" onclick="filterTag(this, 'Recherche')">Recherche</button>
-    <button class="filter-btn" onclick="filterTag(this, 'Startup')">Startup</button>
-    <button class="filter-btn" onclick="filterTag(this, 'Réglementation')">Réglementation</button>
-    <button class="filter-btn" onclick="filterTag(this, 'Robotique')">Robotique</button>
-    <button class="filter-btn" onclick="filterTag(this, 'Open Source')">Open Source</button>
   </div>
 
   <div class="feed">
@@ -395,13 +389,13 @@
   let allItems = [];
 
   const tagQueries = {
-    'Audiovisuel': 'AI cinema film video audiovisual artificial intelligence 2025',
-    'LLM': 'large language model LLM GPT Claude Gemini 2025',
-    'Recherche': 'AI research paper artificial intelligence academic 2025',
-    'Startup': 'AI startup funding investment artificial intelligence 2025',
-    'Réglementation': 'AI regulation law policy government artificial intelligence 2025',
-    'Robotique': 'AI robotics robot artificial intelligence 2025',
-    'Open Source': 'open source AI model artificial intelligence 2025'
+    'Audiovisuel': 'AI artificial intelligence film cinema Hollywood video generation Sora movie studio 2025',
+    'LLM': 'large language model LLM GPT Claude Gemini Mistral release benchmark 2025',
+    'Recherche': 'AI research paper breakthrough DeepMind OpenAI academic published 2025',
+    'Startup': 'AI startup funding round investment unicorn launch 2025',
+    'Réglementation': 'AI regulation law EU act policy government ban 2025',
+    'Robotique': 'AI robotics humanoid robot Boston Dynamics Figure Tesla Optimus 2025',
+    'Open Source': 'open source AI model Llama Mistral Hugging Face release 2025'
   };
 
   function filterTag(btn, tag) {
