@@ -9,10 +9,10 @@ export default async function handler(req, res) {
   const { query } = req.body || {};
 
   try {
-    // STEP 1 : Tavily search pour de vraies actus
+    // STEP 1 : Tavily search pour de vraies actus récentes
     const searchQuery = query
-      ? `AI intelligence artificielle ${query} actualités 2025`
-      : 'intelligence artificielle actualités dernières nouvelles LLM modèles 2025';
+      ? `AI intelligence artificielle ${query} 2025`
+      : 'artificial intelligence news this week 2025';
 
     const tavilyRes = await fetch('https://api.tavily.com/search', {
       method: 'POST',
@@ -20,9 +20,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         api_key: process.env.TAVILY_API_KEY,
         query: searchQuery,
-        search_depth: 'basic',
+        search_depth: 'advanced',
         max_results: 10,
-        include_answer: false
+        include_answer: false,
+        days: 7
       })
     });
 
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
     if (!tavilyRes.ok) return res.status(500).json({ error: tavilyData.message || 'Erreur Tavily' });
 
     const results = tavilyData.results || [];
-    const searchContext = results.map(r => `TITRE: ${r.title}\nURL: ${r.url}\nRÉSUMÉ: ${r.content}`).join('\n\n---\n\n');
+    const searchContext = results.map(r => `TITRE: ${r.title}\nURL: ${r.url}\nDATE: ${r.published_date || 'récent'}\nRÉSUMÉ: ${r.content}`).join('\n\n---\n\n');
 
     // STEP 2 : Groq formate les résultats en JSON propre
     const systemPrompt = `Tu es AI PULSE, un agrégateur de nouvelles IA. Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, juste le JSON brut.
@@ -54,7 +55,8 @@ Règles :
 - Garde les URLs EXACTES telles quelles
 - Résumés en français
 - Tags parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité
-- Sélectionne les articles les plus intéressants`;
+- Sélectionne les 8 articles les plus intéressants
+- Déduis le temps relatif depuis la date fournie ("Il y a 2j", "Aujourd'hui", etc.)`;
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -68,7 +70,7 @@ Règles :
         max_tokens: 4000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Voici les articles trouvés sur le web. Formate-les en JSON :\n\n${searchContext}` }
+          { role: 'user', content: `Voici les articles trouvés cette semaine. Formate-les en JSON :\n\n${searchContext}` }
         ]
       })
     });
