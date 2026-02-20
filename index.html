@@ -394,17 +394,24 @@
 
   let allItems = [];
 
+  const tagQueries = {
+    'Audiovisuel': 'AI cinema film video audiovisual artificial intelligence 2025',
+    'LLM': 'large language model LLM GPT Claude Gemini 2025',
+    'Recherche': 'AI research paper artificial intelligence academic 2025',
+    'Startup': 'AI startup funding investment artificial intelligence 2025',
+    'Réglementation': 'AI regulation law policy government artificial intelligence 2025',
+    'Robotique': 'AI robotics robot artificial intelligence 2025',
+    'Open Source': 'open source AI model artificial intelligence 2025'
+  };
+
   function filterTag(btn, tag) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     if (!tag) {
       renderItems(allItems);
     } else {
-      const filtered = allItems.filter(item => (item.tags || []).includes(tag));
-      renderItems(filtered);
-      if (filtered.length === 0) {
-        document.getElementById('feedContent').innerHTML = '<div class="error-state"><p>Aucun article dans cette catégorie</p><small>Essayez d&#39;actualiser pour obtenir de nouveaux articles.</small></div>';
-      }
+      const q = tagQueries[tag] || tag;
+      loadNews(q);
     }
   }
 
