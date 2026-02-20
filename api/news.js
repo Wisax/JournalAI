@@ -9,7 +9,6 @@ export default async function handler(req, res) {
   const { query } = req.body || {};
 
   try {
-    // STEP 1 : Tavily search pour de vraies actus récentes
     const searchQuery = query
       ? `AI intelligence artificielle ${query} 2025`
       : 'artificial intelligence AI news latest week february 2025';
@@ -30,28 +29,28 @@ export default async function handler(req, res) {
 
     const tavilyRaw = await tavilyRes.text();
     let tavilyData;
-    try { tavilyData = JSON.parse(tavilyRaw); } catch(e) { return res.status(500).json({ error: "Tavily: " + tavilyRaw.slice(0, 200) }); }
+    try {
+      tavilyData = JSON.parse(tavilyRaw);
+    } catch(e) {
+      return res.status(500).json({ error: 'Tavily: ' + tavilyRaw.slice(0, 200) });
+    }
     if (!tavilyRes.ok) return res.status(500).json({ error: tavilyData.message || 'Erreur Tavily' });
 
     const results = tavilyData.results || [];
-    const searchContext = results.map(r => `TITRE: ${r.title}
-URL: ${r.url}
-DATE: ${r.published_date || 'récent'}
-RÉSUMÉ: ${(r.content || '').slice(0, 200)}`).join('
----
-');
+    const searchContext = results.map(r =>
+      `TITRE: ${r.title}\nURL: ${r.url}\nDATE: ${r.published_date || 'recent'}\nSUMMARY: ${(r.content || '').slice(0, 200)}`
+    ).join('\n---\n');
 
-    // STEP 2 : Groq formate les résultats en JSON propre
     const systemPrompt = `Tu es AI PULSE, un agrégateur de nouvelles IA. Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, juste le JSON brut.
 
 Format exact :
 {
   "items": [
     {
-      "title": "Titre accrocheur de la news",
-      "summary": "Résumé factuel de 2-3 phrases en français.",
+      "title": "Titre traduit en français",
+      "summary": "Résumé de 2-3 phrases en français.",
       "source": "NOM SOURCE",
-      "url": "https://... (URL EXACTE fournie)",
+      "url": "https://url-exacte",
       "time": "Aujourd'hui",
       "tags": ["LLM", "OpenAI"]
     }
@@ -59,12 +58,10 @@ Format exact :
 }
 
 Règles :
-- Utilise UNIQUEMENT les articles fournis
-- Garde les URLs EXACTES telles quelles
-- Titres ET résumés TOUJOURS en français, même si la source est en anglais (traduis)
+- Traduis les titres et résumés en français
+- Garde les URLs EXACTES
 - Tags parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité
-- Sélectionne les 8 articles les plus intéressants
-- Déduis le temps relatif depuis la date fournie ("Il y a 2j", "Aujourd'hui", etc.)`;
+- Temps relatif depuis la date ("Il y a 2j", "Aujourd'hui", etc.)`;
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -78,7 +75,7 @@ Règles :
         max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Voici les articles trouvés cette semaine. Formate-les en JSON :\n\n${searchContext}` }
+          { role: 'user', content: `Articles trouvés cette semaine, formate en JSON:\n\n${searchContext}` }
         ]
       })
     });
@@ -88,7 +85,7 @@ Règles :
 
     const text = groqData?.choices?.[0]?.message?.content || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return res.status(500).json({ error: 'Pas de JSON dans la réponse', raw: text });
+    if (!jsonMatch) return res.status(500).json({ error: 'Pas de JSON', raw: text });
 
     const parsed = JSON.parse(jsonMatch[0]);
     return res.status(200).json(parsed);
