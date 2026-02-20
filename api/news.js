@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     // STEP 1 : Tavily search pour de vraies actus récentes
     const searchQuery = query
       ? `AI intelligence artificielle ${query} 2025`
-      : 'artificial intelligence news this week 2025';
+      : 'artificial intelligence AI news latest week february 2025';
 
     const tavilyRes = await fetch('https://api.tavily.com/search', {
       method: 'POST',
@@ -20,6 +20,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         api_key: process.env.TAVILY_API_KEY,
         query: searchQuery,
+        topic: 'news',
         search_depth: 'advanced',
         max_results: 10,
         include_answer: false,
