@@ -671,10 +671,10 @@ body {
     items.forEach((item, i) => {
       const el = document.createElement('article');
       el.className = 'news-item';
-      const keywords = encodeURIComponent((item.title || 'artificial intelligence technology').split(' ').slice(0,3).join(' '));
-      const fallbackImg = `https://source.unsplash.com/800x400/?${keywords},technology`;
+      const seed = (item.title || '').charCodeAt(0) * 7 + i * 13 + 100;
+      const fallbackImg = `https://picsum.photos/seed/${seed}/800/400`;
       const imgSrc = item.image || fallbackImg;
-      const imgHtml = `<div class="news-img-wrap"><img class="news-img" src="${imgSrc}" alt="" loading="lazy" onerror="this.src='https://source.unsplash.com/800x400/?artificial,intelligence'"></div>`;
+      const imgHtml = `<div class="news-img-wrap"><img class="news-img" src="${imgSrc}" alt="" loading="lazy" onerror="this.src='https://picsum.photos/seed/ai${i}/800/400'"></div>`;
 
       el.innerHTML = `
         ${imgHtml}
