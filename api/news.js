@@ -28,36 +28,33 @@ Règles :
 - Titres percutants style presse
 - Résumés factuels et informatifs en français
 - Sources réelles (TechCrunch, The Verge, Wired, Reuters, Le Monde, etc.)
-- URLs réelles issues de ta recherche web
+- URLs plausibles des vraies sources
 - Tags pertinents parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité
 - Temps relatif : "Il y a Xh", "Il y a Xmin", "Aujourd'hui"
-- Actualités des dernières 48h maximum
+- Actualités des dernières semaines
 - Variété de sujets et d'entreprises`;
 
   const userPrompt = query
-    ? `Recherche des actualités récentes sur : "${query}" dans le monde de l'IA. Génère 5 actualités récentes et crédibles sur ce sujet.`
-    : `Recherche et liste les 8 actualités les plus importantes et récentes dans le monde de l'IA (nouvelles sorties de modèles, recherches, lancements produits, réglementations, levées de fonds, partenariats...). Couvre des entreprises variées : OpenAI, Google DeepMind, Anthropic, Meta AI, Mistral, xAI, Microsoft, Hugging Face, startups, recherche académique, etc.`;
+    ? `Tu es journaliste IA. Liste 5 actualités récentes et importantes sur : "${query}" dans le monde de l'IA.`
+    : `Tu es journaliste IA. Liste les 8 actualités les plus importantes et récentes dans le monde de l'IA (sorties de modèles, recherches, produits, réglementations, levées de fonds...). Couvre : OpenAI, Google DeepMind, Anthropic, Meta AI, Mistral, xAI, Microsoft, Hugging Face, startups, académique.`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: systemPrompt }]
-          },
-          contents: [
-            { role: 'user', parts: [{ text: userPrompt }] }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4000
-          }
-        })
-      }
-    );
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 4000,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
 
     const data = await response.json();
 
@@ -66,13 +63,8 @@ Règles :
       return res.status(response.status).json({ error: errMsg });
     }
 
-    // Extract text from Gemini response
-    const text = data?.candidates?.[0]?.content?.parts
-      ?.filter(p => p.text)
-      ?.map(p => p.text)
-      ?.join('\n') || '';
+    const text = data?.choices?.[0]?.message?.content || '';
 
-    // Extract JSON robustly
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return res.status(500).json({ error: 'Pas de JSON dans la réponse', raw: text });
 
