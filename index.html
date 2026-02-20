@@ -4,404 +4,591 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI PULSE — Actualités IA en direct</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%230a0a0a'/><text y='72' x='8' font-size='70' font-family='serif' font-weight='900' fill='%23ff2d55'>P</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23ff2d55'/><text y='72' x='12' font-size='68' font-family='serif' font-weight='900' fill='white'>P</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0a;
-    --bg2: #111111;
-    --bg3: #1a1a1a;
-    --ink: #f0ede6;
-    --ink-soft: #a0998e;
-    --ink-faint: #4a4540;
-    --accent: #ff2d55;
-    --accent2: #ff9f0a;
-    --border: #222222;
-    --mono: 'DM Mono', monospace;
-    --serif: 'DM Serif Display', Georgia, serif;
-    --display: 'Bebas Neue', sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--serif);
-    font-size: 15px;
-    line-height: 1.65;
-    min-height: 100vh;
-  }
+:root {
+  --bg: #faf7f2;
+  --bg2: #f0ece3;
+  --bg3: #e8e2d6;
+  --ink: #1a1410;
+  --ink-soft: #6b5f52;
+  --ink-faint: #b0a498;
+  --accent: #ff2d55;
+  --accent2: #ff9500;
+  --accent3: #34c759;
+  --blue: #007aff;
+  --border: #ddd5c8;
+  --mono: 'DM Mono', monospace;
+  --serif: 'Fraunces', Georgia, serif;
+  --display: 'Bebas Neue', sans-serif;
+  --card-shadow: 0 2px 20px rgba(26,20,16,0.08);
+  --card-shadow-hover: 0 12px 48px rgba(26,20,16,0.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-  /* NOISE OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  /* MASTHEAD */
-  .masthead {
-    border-bottom: 1px solid var(--border);
-    padding: 24px 0 16px;
-    text-align: center;
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .masthead::after {
-    content: '';
-    display: block;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    margin-top: 16px;
-  }
-  .masthead-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 28px;
-    margin-bottom: 10px;
-  }
-  .dateline {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--ink-faint);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-  .masthead h1 {
-    font-family: var(--display);
-    font-size: clamp(40px, 7vw, 72px);
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    line-height: 1;
-    color: var(--ink);
-  }
-  .masthead h1 span { color: var(--accent); }
-  .tagline {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--ink-faint);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-top: 6px;
-  }
-  .status-bar {
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    justify-content: center;
-  }
-  .live-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent); }
-    50% { opacity: 0.3; box-shadow: 0 0 2px var(--accent); }
-  }
-  .status-text {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--ink-faint);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .refresh-btn {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--accent);
-    background: none;
-    border: 1px solid var(--accent);
-    padding: 4px 12px;
-    cursor: pointer;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-  .refresh-btn:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 16px rgba(255,45,85,0.4); }
-  .refresh-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+/* CURSOR GLOW */
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,45,85,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+  z-index: 0;
+}
 
-  /* LAYOUT */
-  .container { max-width: 720px; margin: 0 auto; padding: 0 20px 80px; position: relative; z-index: 1; }
+/* TOP BAR */
+.topbar {
+  background: var(--ink);
+  color: white;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topbar-ticker {
+  display: flex;
+  gap: 24px;
+  overflow: hidden;
+}
+.ticker-item { display: flex; align-items: center; gap: 6px; }
+.ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
 
-  /* SEARCH */
-  .search-bar { margin: 24px 0 0; display: flex; gap: 0; }
-  .search-input {
-    flex: 1;
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 10px 16px;
-    border: 1px solid var(--border);
-    border-right: none;
-    background: var(--bg2);
-    color: var(--ink);
-    outline: none;
-    letter-spacing: 0.05em;
-    transition: border-color 0.2s;
-  }
-  .search-input:focus { border-color: var(--accent); }
-  .search-input::placeholder { color: var(--ink-faint); }
-  .search-btn {
-    font-family: var(--mono);
-    font-size: 9px;
-    padding: 10px 18px;
-    background: var(--accent);
-    color: white;
-    border: 1px solid var(--accent);
-    cursor: pointer;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-  .search-btn:hover { background: #e0002a; box-shadow: 0 0 20px rgba(255,45,85,0.3); }
+/* MASTHEAD */
+.masthead {
+  padding: 32px 28px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+.masthead-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--ink);
+  gap: 20px;
+}
+.brand { flex: 1; }
+.brand h1 {
+  font-family: var(--display);
+  font-size: clamp(52px, 8vw, 96px);
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.brand h1 span { color: var(--accent); }
+.brand-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+.masthead-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.dateline {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: right;
+}
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--ink);
+  color: white;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 2px;
+}
+.live-dot {
+  width: 5px; height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent);
+  animation: livepulse 1.8s ease-in-out infinite;
+}
+@keyframes livepulse {
+  0%,100% { opacity:1; box-shadow: 0 0 8px var(--accent); }
+  50% { opacity:0.3; box-shadow: 0 0 2px var(--accent); }
+}
+.refresh-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+  padding: 5px 14px;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.refresh-btn:hover { background: var(--accent); color: white; }
+.refresh-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* FILTERS */
-  .filter-bar { display: flex; gap: 8px; margin: 14px 0 0; }
-  .filter-btn {
-    font-family: var(--mono);
-    font-size: 9px;
-    padding: 5px 14px;
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--ink-faint);
-    cursor: pointer;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-  .filter-btn:hover { border-color: var(--ink-soft); color: var(--ink); }
-  .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 0 12px rgba(255,45,85,0.3); }
+/* CONTROLS */
+.controls {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 0 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.search-wrap { display: flex; flex: 1; min-width: 200px; }
+.search-input {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-right: none;
+  background: white;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--ink-faint); }
+.search-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 9px 16px;
+  background: var(--accent);
+  color: white;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.search-btn:hover { background: #d9003f; }
 
-  /* FEED */
-  .feed { margin-top: 32px; }
-  .feed-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .feed-header h2 {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-  }
-  .feed-header-line { flex: 1; height: 1px; background: var(--border); }
-  .feed-count {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--ink-faint);
-    background: var(--bg3);
-    padding: 2px 8px;
-    border: 1px solid var(--border);
-  }
+.filter-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 9px 16px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--ink-soft);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+.filter-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
 
-  /* NEWS ITEM */
-  .news-item {
-    border-bottom: 1px solid var(--border);
-    padding: 24px 0;
-    opacity: 0;
-    transform: translateY(8px);
-    animation: fadeIn 0.4s ease forwards;
-    position: relative;
-  }
-  .news-item::before {
-    content: '';
-    position: absolute;
-    left: -20px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: transparent;
-    transition: background 0.2s;
-  }
-  .news-item:hover::before { background: var(--accent); }
-  .news-item:nth-child(1) { animation-delay: 0.05s; }
-  .news-item:nth-child(2) { animation-delay: 0.1s; }
-  .news-item:nth-child(3) { animation-delay: 0.15s; }
-  .news-item:nth-child(4) { animation-delay: 0.2s; }
-  .news-item:nth-child(n+5) { animation-delay: 0.25s; }
-  @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+/* CONTAINER */
+.page { max-width: 1200px; margin: 0 auto; padding: 28px 0 80px; position: relative; z-index: 1; }
 
-  .news-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-  }
-  .news-time { font-family: var(--mono); font-size: 9px; color: var(--ink-faint); letter-spacing: 0.05em; }
-  .news-source {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--accent2);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .dot-sep { color: var(--ink-faint); font-size: 8px; }
+/* FEED HEADER */
+.feed-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.feed-header h2 {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.feed-line { flex:1; height:1px; background: var(--border); }
+.feed-count {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+}
 
-  .news-title {
-    font-family: var(--serif);
-    font-size: 20px;
-    font-weight: 400;
-    line-height: 1.3;
-    color: var(--ink);
-    margin-bottom: 10px;
-    letter-spacing: -0.01em;
-    transition: color 0.2s;
-  }
-  .news-item:hover .news-title { color: white; }
+/* GRID */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+.news-grid .news-item:first-child {
+  grid-column: 1 / 3;
+}
 
-  .news-summary {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-soft);
-    line-height: 1.8;
-    margin-bottom: 14px;
-    padding-left: 12px;
-    border-left: 2px solid var(--bg3);
-  }
+/* NEWS CARD */
+.news-item {
+  background: white;
+  padding: 28px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: cardIn 0.5s ease forwards;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.3s, transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.news-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.news-item:hover::before { transform: scaleX(1); }
+.news-item:hover {
+  border-color: var(--border);
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-4px);
+  z-index: 2;
+}
+.news-item:nth-child(1) { animation-delay: 0.05s; }
+.news-item:nth-child(2) { animation-delay: 0.1s; }
+.news-item:nth-child(3) { animation-delay: 0.15s; }
+.news-item:nth-child(4) { animation-delay: 0.2s; }
+.news-item:nth-child(5) { animation-delay: 0.25s; }
+.news-item:nth-child(n+6) { animation-delay: 0.3s; }
+@keyframes cardIn { to { opacity:1; transform: translateY(0); } }
 
-  .news-link {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--accent);
-    text-decoration: none;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .news-link::after { content: '→'; transition: transform 0.2s; }
-  .news-link:hover::after { transform: translateX(4px); }
+.news-item-num {
+  font-family: var(--display);
+  font-size: 48px;
+  line-height: 1;
+  color: var(--bg2);
+  position: absolute;
+  top: 16px; right: 20px;
+  transition: color 0.3s;
+  user-select: none;
+}
+.news-item:hover .news-item-num { color: rgba(255,45,85,0.1); }
 
-  /* LOADING */
-  .loading-state { text-align: center; padding: 80px 20px; }
-  .loading-animation { display: inline-flex; gap: 8px; margin-bottom: 20px; }
-  .loading-animation span {
-    width: 4px; height: 4px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: bounce 0.9s ease-in-out infinite;
-    box-shadow: 0 0 6px var(--accent);
-  }
-  .loading-animation span:nth-child(2) { animation-delay: 0.2s; background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
-  .loading-animation span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); opacity: 0.2; }
-    50% { transform: translateY(-8px); opacity: 1; }
-  }
-  .loading-text { font-family: var(--display); font-size: 18px; color: var(--ink-soft); letter-spacing: 0.1em; }
-  .loading-subtext { font-family: var(--mono); font-size: 10px; color: var(--ink-faint); margin-top: 8px; letter-spacing: 0.08em; }
+.news-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.news-source {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.news-time {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+}
+.dot-sep { color: var(--ink-faint); font-size: 8px; }
 
-  /* ERROR */
-  .error-state { text-align: center; padding: 60px 20px; border: 1px solid var(--border); background: var(--bg2); }
-  .error-state p { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.05em; }
-  .error-state small { font-family: var(--mono); font-size: 10px; color: var(--ink-faint); }
+.news-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.3;
+  color: var(--ink);
+  transition: color 0.2s;
+}
+.news-item:first-child .news-title { font-size: 26px; }
+.news-item:hover .news-title { color: var(--accent); }
 
-  /* DIVIDER */
-  .section-divider {
-    text-align: center;
-    margin: 8px 0;
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--ink-faint);
-    letter-spacing: 0.4em;
-  }
+.news-summary {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  flex: 1;
+}
 
-  /* FOOTER */
-  .footer {
-    margin-top: 60px;
-    padding-top: 20px;
-    text-align: center;
-    border-top: 1px solid var(--border);
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--ink-faint);
-    letter-spacing: 0.1em;
-  }
-  .footer-logo {
-    font-family: var(--display);
-    font-size: 22px;
-    letter-spacing: 0.1em;
-    color: var(--ink-faint);
-    margin-bottom: 8px;
-  }
-  .footer-logo span { color: var(--accent); opacity: 0.4; }
+.news-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--bg2);
+}
+.news-link {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s;
+}
+.news-link .arrow { transition: transform 0.2s; }
+.news-item:hover .news-link { color: var(--accent); }
+.news-item:hover .news-link .arrow { transform: translateX(4px); }
+
+/* READ MORE OVERLAY */
+.read-more-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,20,16,0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+.read-more-overlay.open { opacity: 1; pointer-events: all; }
+.read-more-panel {
+  background: white;
+  max-width: 640px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 48px;
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s;
+}
+.read-more-overlay.open .read-more-panel { transform: translateY(0); }
+.panel-close {
+  position: absolute;
+  top: 20px; right: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  letter-spacing: 0.1em;
+  transition: all 0.2s;
+}
+.panel-close:hover { background: var(--ink); color: white; border-color: var(--ink); }
+.panel-source {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+}
+.panel-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 20px;
+  color: var(--ink);
+}
+.panel-body {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+.panel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  background: var(--accent);
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+.panel-link:hover { background: #d9003f; }
+
+/* LOADING */
+.loading-state { text-align: center; padding: 100px 20px; }
+.loading-bars {
+  display: inline-flex;
+  gap: 5px;
+  align-items: flex-end;
+  height: 32px;
+  margin-bottom: 24px;
+}
+.loading-bars span {
+  width: 4px;
+  background: var(--accent);
+  border-radius: 2px;
+  animation: bar 0.9s ease-in-out infinite;
+}
+.loading-bars span:nth-child(1) { animation-delay: 0s; }
+.loading-bars span:nth-child(2) { animation-delay: 0.15s; background: var(--accent2); }
+.loading-bars span:nth-child(3) { animation-delay: 0.3s; }
+.loading-bars span:nth-child(4) { animation-delay: 0.45s; background: var(--accent2); }
+.loading-bars span:nth-child(5) { animation-delay: 0.6s; }
+@keyframes bar {
+  0%,100% { height: 8px; opacity: 0.3; }
+  50% { height: 28px; opacity: 1; }
+}
+.loading-text { font-family: var(--display); font-size: 24px; color: var(--ink-soft); letter-spacing: 0.1em; }
+.loading-subtext { font-family: var(--mono); font-size: 10px; color: var(--ink-faint); margin-top: 8px; }
+
+/* ERROR */
+.error-state { text-align: center; padding: 60px; background: white; border: 1px solid var(--border); }
+.error-state p { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 8px; }
+.error-state small { font-family: var(--mono); font-size: 10px; color: var(--ink-faint); }
+
+/* FOOTER */
+.footer {
+  max-width: 1200px;
+  margin: 60px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo { font-family: var(--display); font-size: 22px; letter-spacing: 0.08em; color: var(--ink-faint); }
+.footer-logo span { color: var(--accent); opacity: 0.5; }
+.footer-right { font-family: var(--mono); font-size: 9px; color: var(--ink-faint); letter-spacing: 0.1em; text-align: right; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .masthead { padding: 16px 16px 0; }
+  .news-grid { grid-template-columns: 1fr; }
+  .news-grid .news-item:first-child { grid-column: 1; }
+  .page { padding: 20px 16px 60px; }
+  .controls { padding: 16px 16px 0; }
+  .topbar { display: none; }
+  .footer { padding: 20px 16px; flex-direction: column; gap: 10px; text-align: center; }
+}
 </style>
 </head>
 <body>
 
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<div class="topbar">
+  <div class="topbar-ticker">
+    <div class="ticker-item"><span class="ticker-dot"></span><span id="tickerDate"></span></div>
+    <div class="ticker-item"><span class="ticker-dot" style="background:var(--accent2)"></span><span>Intelligence Artificielle</span></div>
+  </div>
+  <div>Vol. I — Édition Numérique</div>
+</div>
+
 <header class="masthead">
-  <div class="masthead-top">
-    <div class="dateline" id="dateline"></div>
-    <div></div>
-    <div class="dateline">Édition Quotidienne</div>
+  <div class="masthead-inner">
+    <div class="brand">
+      <h1>AI <span>PULSE</span></h1>
+      <div class="brand-sub">L'actualité IA en temps réel</div>
+    </div>
+    <div class="masthead-right">
+      <div class="dateline" id="dateline"></div>
+      <div class="live-pill"><span class="live-dot"></span><span id="statusText">En attente</span></div>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadNews()">↻ Actualiser</button>
+    </div>
   </div>
-  <h1>AI <span>PULSE</span></h1>
-  <div class="tagline">Toute l'actualité intelligence artificielle</div>
-  <div class="status-bar">
-    <span class="live-dot"></span>
-    <span class="status-text" id="statusText">En attente</span>
-    <button class="refresh-btn" id="refreshBtn" onclick="loadNews()">↻ Actualiser</button>
-  </div>
-</header>
-
-<div class="container">
-  <div class="search-bar">
-    <input class="search-input" id="searchInput" type="text" placeholder="Rechercher... GPT-5, robotique, Sora..." />
-    <button class="search-btn" onclick="searchTopic()">Chercher</button>
-  </div>
-
-  <div class="filter-bar">
+  <div class="controls" style="padding: 16px 0 0;">
+    <div class="search-wrap">
+      <input class="search-input" id="searchInput" type="text" placeholder="Rechercher... GPT-5, robotique, Sora..." />
+      <button class="search-btn" onclick="searchTopic()">Chercher</button>
+    </div>
     <button class="filter-btn active" onclick="filterTag(this, null)">Tout</button>
     <button class="filter-btn" onclick="filterTag(this, 'Audiovisuel')">🎬 Audiovisuel</button>
   </div>
+</header>
 
-  <div class="feed">
-    <div class="feed-header">
-      <h2>Fil d'actualités</h2>
-      <div class="feed-header-line"></div>
-      <span class="feed-count" id="feedCount"></span>
-    </div>
-    <div id="feedContent">
-      <div class="loading-state">
-        <div class="loading-animation"><span></span><span></span><span></span></div>
-        <div class="loading-text">Chargement</div>
-        <div class="loading-subtext">Scan des dernières actualités IA...</div>
-      </div>
+<div style="max-width:1200px;margin:0 auto;padding:0 28px;">
+  <div class="feed-header" style="margin-top:28px;">
+    <h2>Fil d'actualités</h2>
+    <div class="feed-line"></div>
+    <span class="feed-count" id="feedCount"></span>
+  </div>
+  <div id="feedContent">
+    <div class="loading-state">
+      <div class="loading-bars"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="loading-text">Chargement</div>
+      <div class="loading-subtext">Scan des dernières actualités IA...</div>
     </div>
   </div>
-
   <div class="footer">
     <div class="footer-logo">AI <span>PULSE</span></div>
-    
+    <div class="footer-right" id="footerDate"></div>
+  </div>
+</div>
+
+<!-- READ MORE PANEL -->
+<div class="read-more-overlay" id="overlay" onclick="closePanel(event)">
+  <div class="read-more-panel" id="panel">
+    <button class="panel-close" onclick="closeOverlay()">✕ Fermer</button>
+    <div class="panel-source" id="panelSource"></div>
+    <h2 class="panel-title" id="panelTitle"></h2>
+    <p class="panel-body" id="panelBody"></p>
+    <a class="panel-link" id="panelLink" href="#" target="_blank" rel="noopener">Lire l'article complet →</a>
   </div>
 </div>
 
 <script>
-  function setDateline() {
+  // CURSOR GLOW
+  document.addEventListener('mousemove', e => {
+    const g = document.getElementById('cursorGlow');
+    g.style.left = e.clientX + 'px';
+    g.style.top = e.clientY + 'px';
+  });
+
+  // DATE
+  function setDates() {
     const now = new Date();
     const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('dateline').textContent = now.toLocaleDateString('fr-FR', opts).toUpperCase();
+    const d = now.toLocaleDateString('fr-FR', opts).toUpperCase();
+    document.getElementById('dateline').textContent = d;
+    document.getElementById('tickerDate').textContent = d;
+    document.getElementById('footerDate').textContent = `Mis à jour ${now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
   }
-  setDateline();
+  setDates();
 
   async function fetchAINews(query = null) {
     const response = await fetch('/api/news', {
@@ -417,33 +604,57 @@
     return data.items || [];
   }
 
+  function openArticle(item) {
+    document.getElementById('panelSource').textContent = item.source || 'SOURCE';
+    document.getElementById('panelTitle').textContent = item.title;
+    document.getElementById('panelBody').textContent = item.summary;
+    const link = document.getElementById('panelLink');
+    link.href = item.url || '#';
+    document.getElementById('overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeOverlay() {
+    document.getElementById('overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closePanel(e) {
+    if (e.target === document.getElementById('overlay')) closeOverlay();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
   function renderItems(items) {
     const feed = document.getElementById('feedContent');
     feed.innerHTML = '';
     document.getElementById('feedCount').textContent = `${items.length} articles`;
 
+    const grid = document.createElement('div');
+    grid.className = 'news-grid';
+
     items.forEach((item, i) => {
       const el = document.createElement('article');
       el.className = 'news-item';
       el.innerHTML = `
+        <div class="news-item-num">${String(i+1).padStart(2,'0')}</div>
         <div class="news-meta">
-          <span class="news-time">${item.time || "Aujourd'hui"}</span>
+          <span class="news-source">${item.source || 'SOURCE'}</span>
           <span class="dot-sep">·</span>
-          <span class="news-source">${item.source || 'IA NEWS'}</span>
+          <span class="news-time">${item.time || "Aujourd'hui"}</span>
         </div>
         <h3 class="news-title">${item.title}</h3>
         <p class="news-summary">${item.summary}</p>
-        <a class="news-link" href="${item.url || '#'}" target="_blank" rel="noopener">Lire la source</a>
+        <div class="news-footer">
+          <a class="news-link" href="${item.url || '#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Lire la source <span class="arrow">→</span></a>
+        </div>
       `;
-      feed.appendChild(el);
-
-      if (i < items.length - 1 && i % 3 === 2) {
-        const div = document.createElement('div');
-        div.className = 'section-divider';
-        div.textContent = '· · ·';
-        feed.appendChild(div);
-      }
+      el.addEventListener('click', () => openArticle(item));
+      grid.appendChild(el);
     });
+
+    feed.appendChild(grid);
+    setDates();
   }
 
   let allItems = [];
@@ -456,10 +667,10 @@
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     if (!tag) {
-      renderItems(allItems);
+      if (allItems.length) renderItems(allItems);
+      else loadNews();
     } else {
-      const q = tagQueries[tag] || tag;
-      loadNews(q);
+      loadNews(tagQueries[tag] || tag);
     }
   }
 
@@ -474,19 +685,17 @@
 
     feed.innerHTML = `
       <div class="loading-state">
-        <div class="loading-animation"><span></span><span></span><span></span></div>
+        <div class="loading-bars"><span></span><span></span><span></span><span></span><span></span></div>
         <div class="loading-text">${query ? 'Recherche' : 'Chargement'}</div>
         <div class="loading-subtext">Scan des dernières actualités IA...</div>
       </div>`;
 
     try {
       const items = await fetchAINews(query);
-      allItems = items;
+      allItems = query ? allItems : items;
       renderItems(items);
-      const now = new Date();
-      status.textContent = `Mis à jour ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+      status.textContent = 'En direct';
     } catch (err) {
-      console.error(err);
       feed.innerHTML = `
         <div class="error-state">
           <p>⚠ Impossible de charger les actualités</p>
@@ -494,7 +703,6 @@
         </div>`;
       status.textContent = 'Erreur';
     }
-
     btn.disabled = false;
   }
 
