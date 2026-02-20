@@ -59,7 +59,7 @@ Format exact :
 Règles :
 - Utilise UNIQUEMENT les articles fournis
 - Garde les URLs EXACTES telles quelles
-- Résumés en français
+- Titres ET résumés TOUJOURS en français, même si la source est en anglais (traduis)
 - Tags parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité
 - Sélectionne les 8 articles les plus intéressants
 - Déduis le temps relatif depuis la date fournie ("Il y a 2j", "Aujourd'hui", etc.)`;
