@@ -495,7 +495,38 @@ body {
 .footer-logo span { color: var(--accent); opacity: 0.5; }
 .footer-right { font-family: var(--mono); font-size: 9px; color: var(--ink-faint); letter-spacing: 0.1em; text-align: right; }
 
-/* RESPONSIVE */
+
+  /* CARD IMAGE */
+  .news-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    background: var(--bg2);
+    transition: transform 0.4s ease;
+  }
+  .news-item:first-child .news-img { height: 240px; }
+  .news-item:hover .news-img { transform: scale(1.03); }
+  .news-img-wrap {
+    overflow: hidden;
+    margin: -28px -28px 0;
+  }
+  .news-img-placeholder {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--display);
+    font-size: 32px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+    margin: -28px -28px 0;
+  }
+  .news-item:first-child .news-img-placeholder { height: 240px; }
+
+  /* RESPONSIVE */
 @media (max-width: 768px) {
   .masthead { padding: 16px 16px 0; }
   .news-grid { grid-template-columns: 1fr; }
@@ -564,6 +595,7 @@ body {
 <div class="read-more-overlay" id="overlay" onclick="closePanel(event)">
   <div class="read-more-panel" id="panel">
     <button class="panel-close" onclick="closeOverlay()">✕ Fermer</button>
+    <img id="panelImg" style="width:100%;height:220px;object-fit:cover;margin:-48px -48px 28px;width:calc(100% + 96px);display:none;" alt="">
     <div class="panel-source" id="panelSource"></div>
     <h2 class="panel-title" id="panelTitle"></h2>
     <p class="panel-body" id="panelBody"></p>
@@ -605,6 +637,9 @@ body {
   }
 
   function openArticle(item) {
+    const panelImg = document.getElementById('panelImg');
+    if (item.image) { panelImg.src = item.image; panelImg.style.display = 'block'; }
+    else { panelImg.style.display = 'none'; }
     document.getElementById('panelSource').textContent = item.source || 'SOURCE';
     document.getElementById('panelTitle').textContent = item.title;
     document.getElementById('panelBody').textContent = item.summary;
@@ -636,7 +671,12 @@ body {
     items.forEach((item, i) => {
       const el = document.createElement('article');
       el.className = 'news-item';
+      const imgHtml = item.image
+        ? `<div class="news-img-wrap"><img class="news-img" src="${item.image}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+        : `<div class="news-img-placeholder">AI</div>`;
+
       el.innerHTML = `
+        ${imgHtml}
         <div class="news-item-num">${String(i+1).padStart(2,'0')}</div>
         <div class="news-meta">
           <span class="news-source">${item.source || 'SOURCE'}</span>
