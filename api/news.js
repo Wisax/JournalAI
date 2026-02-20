@@ -60,7 +60,7 @@ Format exact :
 Règles :
 - Traduis les titres et résumés en français
 - Garde les URLs EXACTES
-- Tags parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité
+- Tags parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité, Audiovisuel
 - Temps relatif depuis la date ("Il y a 2j", "Aujourd'hui", etc.)`;
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
