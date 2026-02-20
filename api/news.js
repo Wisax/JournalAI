@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         query: searchQuery,
         topic: 'news',
         search_depth: 'advanced',
-        max_results: 10,
+        max_results: 6,
         include_answer: false,
         days: 7
       })
@@ -32,7 +32,12 @@ export default async function handler(req, res) {
     if (!tavilyRes.ok) return res.status(500).json({ error: tavilyData.message || 'Erreur Tavily' });
 
     const results = tavilyData.results || [];
-    const searchContext = results.map(r => `TITRE: ${r.title}\nURL: ${r.url}\nDATE: ${r.published_date || 'récent'}\nRÉSUMÉ: ${r.content}`).join('\n\n---\n\n');
+    const searchContext = results.map(r => `TITRE: ${r.title}
+URL: ${r.url}
+DATE: ${r.published_date || 'récent'}
+RÉSUMÉ: ${(r.content || '').slice(0, 200)}`).join('
+---
+');
 
     // STEP 2 : Groq formate les résultats en JSON propre
     const systemPrompt = `Tu es AI PULSE, un agrégateur de nouvelles IA. Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, juste le JSON brut.
