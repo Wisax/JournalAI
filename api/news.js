@@ -28,7 +28,9 @@ export default async function handler(req, res) {
       })
     });
 
-    const tavilyData = await tavilyRes.json();
+    const tavilyRaw = await tavilyRes.text();
+    let tavilyData;
+    try { tavilyData = JSON.parse(tavilyRaw); } catch(e) { return res.status(500).json({ error: "Tavily: " + tavilyRaw.slice(0, 200) }); }
     if (!tavilyRes.ok) return res.status(500).json({ error: tavilyData.message || 'Erreur Tavily' });
 
     const results = tavilyData.results || [];
