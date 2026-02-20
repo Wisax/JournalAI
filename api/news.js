@@ -23,6 +23,7 @@ export default async function handler(req, res) {
         search_depth: 'basic',
         max_results: 6,
         include_answer: false,
+        include_images: true,
         days: 7
       })
     });
@@ -37,8 +38,9 @@ export default async function handler(req, res) {
     if (!tavilyRes.ok) return res.status(500).json({ error: tavilyData.message || 'Erreur Tavily' });
 
     const results = tavilyData.results || [];
-    const searchContext = results.map(r =>
-      `TITRE: ${r.title}\nURL: ${r.url}\nDATE: ${r.published_date || 'recent'}\nSUMMARY: ${(r.content || '').slice(0, 200)}`
+    const images = tavilyData.images || [];
+    const searchContext = results.map((r, i) =>
+      `TITRE: ${r.title}\nURL: ${r.url}\nDATE: ${r.published_date || 'recent'}\nIMAGE: ${images[i] || ''}\nSUMMARY: ${(r.content || '').slice(0, 200)}`
     ).join('\n---\n');
 
     const systemPrompt = `Tu es AI PULSE, un agrégateur de nouvelles IA. Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, juste le JSON brut.
@@ -51,6 +53,7 @@ Format exact :
       "summary": "Résumé de 2-3 phrases en français.",
       "source": "NOM SOURCE",
       "url": "https://url-exacte",
+      "image": "https://image-url-ou-vide",
       "time": "Aujourd'hui",
       "tags": ["LLM", "OpenAI"]
     }
@@ -59,8 +62,9 @@ Format exact :
 
 Règles :
 - Traduis les titres et résumés en français
+- Inclus le champ image avec l'URL exacte fournie (ou "" si pas d'image)
 - Garde les URLs EXACTES
-- Tags parmi : LLM, Vision, Audio, Robotique, Réglementation, Recherche, Startup, Open Source, Hardware, Multimodal, Agent, Sécurité, Audiovisuel
+- Tags parmi : Audiovisuel (si lié au cinéma/vidéo/IA générative visuelle), ou laisse vide sinon
 - Temps relatif depuis la date ("Il y a 2j", "Aujourd'hui", etc.)`;
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
